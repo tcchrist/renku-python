@@ -18,9 +18,25 @@
 """Renku service controller mixin."""
 
 from abc import abstractmethod
+from functools import wraps
 
 from renku.core.utils.contexts import chdir
 from renku.service.controllers.utils.remote_project import RemoteProject
+from renku.service.errors import IdentificationError
+
+
+def local_identity(method):
+    """Ensure identity on local execution."""
+    # noqa
+    @wraps(method)
+    def _impl(self, *method_args, **method_kwargs):
+        """Implementation of method wrapper."""
+        if not self.user:
+            raise IdentificationError("user identification is missing")
+
+        return method(self, *method_args, **method_kwargs)
+
+    return _impl
 
 
 class ReadOperationMixin:
@@ -28,11 +44,12 @@ class ReadOperationMixin:
 
     def __init__(self, cache, user_data, request_data):
         """Read operation mixin for controllers."""
-        self.user = cache.ensure_user(user_data)
-
         self.cache = cache
         self.user_data = user_data
         self.request_data = request_data
+
+        if user_data:
+            self.user = cache.ensure_user(user_data)
 
     @property
     @abstractmethod
@@ -42,18 +59,19 @@ class ReadOperationMixin:
 
     @abstractmethod
     def renku_op(self):
-        """Implements renku operation for the controller."""
+        """Implements operation for the controller."""
         raise NotImplementedError
 
+    @local_identity
     def local(self):
-        """Execute renku operation against service cache."""
+        """Execute operation against service cache."""
         project = self.cache.get_project(self.user, self.context["project_id"])
 
         with chdir(project.abs_path):
             return self.renku_op()
 
     def remote(self):
-        """Execute renku operation against remote project."""
+        """Execute operation against remote project."""
         project = RemoteProject(self.user_data, self.request_data)
 
         with project.remote():

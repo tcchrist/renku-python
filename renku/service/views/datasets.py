@@ -66,6 +66,7 @@ from renku.service.views.decorators import (
     header_doc,
     requires_cache,
     requires_identity,
+    optional_identity,
 )
 
 DATASET_BLUEPRINT_TAG = "datasets"
@@ -80,7 +81,7 @@ dataset_blueprint = Blueprint(DATASET_BLUEPRINT_TAG, __name__, url_prefix=SERVIC
 )
 @handle_common_except
 @requires_cache
-@requires_identity
+@optional_identity
 def list_datasets_view(user, cache):
     """List all datasets in project."""
     return DatasetsListCtrl(cache, user, dict(request.args)).to_response()
@@ -94,7 +95,7 @@ def list_datasets_view(user, cache):
 )
 @handle_common_except
 @requires_cache
-@requires_identity
+@optional_identity
 def list_dataset_files_view(user, cache):
     """List files in a dataset."""
     return DatasetsFilesListCtrl(cache, user, dict(request.args)).to_response()

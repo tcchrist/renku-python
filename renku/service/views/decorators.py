@@ -48,12 +48,28 @@ def requires_identity(f):
     def decorated_function(*args, **kws):
         """Represents decorated function."""
         try:
-            user = UserIdentityHeaders().load(request.headers)
+            user_identity = UserIdentityHeaders().load(request.headers)
         except (ValidationError, KeyError):
             err_message = "user identification is incorrect or missing"
             return jsonify(error={"code": INVALID_HEADERS_ERROR_CODE, "reason": err_message})
 
-        return f(user, *args, **kws)
+        return f(user_identity, *args, **kws)
+
+    return decorated_function
+
+
+def optional_identity(f):
+    """Wrapper which indicates partial dependency on user identification."""
+
+    @wraps(f)
+    def decorated_function(*args, **kws):
+        """Represents decorated function."""
+        try:
+            user_identity = UserIdentityHeaders().load(request.headers)
+        except (ValidationError, KeyError):
+            return f(None, *args, **kws)
+
+        return f(user_identity, *args, **kws)
 
     return decorated_function
 

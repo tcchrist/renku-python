@@ -17,7 +17,7 @@
 # limitations under the License.
 """Renku service datasets serializers."""
 import marshmallow
-from marshmallow import Schema, fields, post_load, pre_load
+from marshmallow import Schema, fields, post_load, pre_load, ValidationError
 
 from renku.service.serializers.rpc import JsonRPCResponse
 

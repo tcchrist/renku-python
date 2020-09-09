@@ -22,7 +22,7 @@ import uuid
 import pytest
 from flaky import flaky
 
-from renku.service.config import INVALID_HEADERS_ERROR_CODE
+from renku.service.config import INVALID_HEADERS_ERROR_CODE, INVALID_PARAMS_ERROR_CODE
 
 
 @pytest.mark.service
@@ -57,10 +57,8 @@ def test_auth_headers_exc(service_allowed_endpoint):
     response = client_method(request["url"], headers=request["headers"],)
 
     assert 200 == response.status_code
-    assert INVALID_HEADERS_ERROR_CODE == response.json["error"]["code"]
-
-    err_message = "user identification is incorrect or missing"
-    assert err_message == response.json["error"]["reason"]
+    assert response.json["error"]["code"] in [INVALID_HEADERS_ERROR_CODE, INVALID_PARAMS_ERROR_CODE]
+    assert response.json["error"]["reason"]
 
 
 @pytest.mark.service
