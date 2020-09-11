@@ -54,7 +54,7 @@ class ReadOperationMixin:
     @property
     @abstractmethod
     def context(self):
-        """Operation context"""
+        """Operation context."""
         raise NotImplementedError
 
     @abstractmethod
