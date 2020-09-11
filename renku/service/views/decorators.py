@@ -221,38 +221,20 @@ def header_doc(description, tags=()):
         params={
             "Authorization": {
                 "description": (
-                    "Used for users git oauth2 access. " "For example: " "```Authorization: Bearer asdf-qwer-zxcv```"
+                    "Used for users git oauth2 access. " "For example: " "```Bearer asdf-qwer-zxcv```"
                 ),
                 "in": "header",
                 "type": "string",
-                "required": True,
             },
-            "Renku-User-Id": {
+            "Renku-User": {
                 "description": (
-                    "Used for identification of the users. "
+                    "JWT used for identification of the users. "
                     "For example: "
-                    "```Renku-User-Id: sasdsa-sadsd-gsdsdh-gfdgdsd```"
+                    "```a9bd31fb.bfad4899b8bdf.d0908fab19d```"
                 ),
                 "in": "header",
                 "type": "string",
-                "required": True,
-            },
-            "Renku-User-FullName": {
-                "description": (
-                    "Used for commit author signature. " "For example: " "```Renku-User-FullName: Rok Roskar```"
-                ),
-                "in": "header",
-                "type": "string",
-                "required": True,
-            },
-            "Renku-User-Email": {
-                "description": (
-                    "Used for commit author signature. " "For example: " "```Renku-User-Email: dev@renkulab.io```"
-                ),
-                "in": "header",
-                "type": "string",
-                "required": True,
-            },
+            }
         },
         tags=list(tags),
     )
