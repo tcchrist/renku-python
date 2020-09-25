@@ -26,3 +26,19 @@ class ProjectNotFound(RenkuException):
         """Build a custom message."""
         message = f'project_id "{project_id}" not found'
         super(ProjectNotFound, self).__init__(message)
+
+
+class OperationNotSupported(RenkuException):
+    """Operation not supported exception."""
+
+    def __init__(self, reason):
+        message = f'operation not supported: "{reason}"'
+        super(OperationNotSupported, self).__init__(message)
+
+
+class AuthenticationTokenMissing(RenkuException):
+    """Authentication token is missing."""
+
+    def __init__(self):
+        message = "authentication token is missing"
+        super(AuthenticationTokenMissing, self).__init__(message)

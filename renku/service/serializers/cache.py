@@ -112,10 +112,10 @@ class ProjectCloneContext(ProjectCloneRequest):
     # measured in ms
     timestamp = fields.Integer(missing=time.time() * 1e3)
 
-    name = fields.String(required=True)
-    fullname = fields.String(required=True)
-    email = fields.String(required=True)
-    owner = fields.String(required=True)
+    name = fields.String()
+    fullname = fields.String()
+    email = fields.String()
+    owner = fields.String()
     token = fields.String(required=True)
     ref = fields.String(missing="master")
 

@@ -21,6 +21,7 @@ from abc import abstractmethod
 
 from renku.core.utils.contexts import chdir
 from renku.service.controllers.utils.remote_project import RemoteProject
+from renku.service.errors import AuthenticationTokenMissing, OperationNotSupported
 
 
 class ReadOperationMixin:
@@ -28,7 +29,8 @@ class ReadOperationMixin:
 
     def __init__(self, cache, user_data, request_data):
         """Read operation mixin for controllers."""
-        self.user = cache.ensure_user(user_data)
+        if "user_id" in user_data and cache is not None:
+            self.user = cache.ensure_user(user_data)
 
         self.cache = cache
         self.user_data = user_data
@@ -47,6 +49,9 @@ class ReadOperationMixin:
 
     def local(self):
         """Execute renku operation against service cache."""
+        if self.user is None or self.cache is None:
+            raise OperationNotSupported("local execution is disabled")
+
         project = self.cache.get_project(self.user, self.context["project_id"])
 
         with chdir(project.abs_path):
@@ -54,6 +59,9 @@ class ReadOperationMixin:
 
     def remote(self):
         """Execute renku operation against remote project."""
+        if "token" not in self.user_data:
+            raise AuthenticationTokenMissing()
+
         project = RemoteProject(self.user_data, self.request_data)
 
         with project.remote():

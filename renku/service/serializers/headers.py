@@ -40,9 +40,9 @@ class UserIdentityHeaders(Schema):
     email = fields.String(data_key="renku-user-email")
     token = fields.String(data_key="authorization")
 
-    def extract_token(self, data):
+    @staticmethod
+    def extract_token(value):
         """Extract token."""
-        value = data.get("authorization", "")
         components = value.split(" ")
 
         rfc_compliant = value.lower().startswith("bearer")
@@ -68,6 +68,6 @@ class UserIdentityHeaders(Schema):
 
         if {"renku-user-id", "authorization"}.issubset(set(data.keys())):
             data["renku-user-id"] = secure_filename(data["renku-user-id"])
-            data["authorization"] = self.extract_token(data)
+            data["authorization"] = self.extract_token(data["authorization"])
 
         return data
