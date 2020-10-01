@@ -75,7 +75,7 @@ def report_success(request_payload, graph_payload, callback_url):
     return data
 
 
-def graph_build_job(revision, git_url, callback_url, token):
+def graph_build_job(revision, git_url, callback_url, token, timeout=None):
     """Build graph and post triples to callback URL."""
     if not urlparse(callback_url).geturl():
         raise RuntimeError("invalid callback_url")
