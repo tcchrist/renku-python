@@ -28,25 +28,53 @@ class Dataset:
 
     def __init__(self):
         self._dataset = None
+        self._files = []
 
     @classmethod
-    def from_dataset_metadata(cls, path, client):
+    def __from_yaml(cls, path, client):
         """Create an instance from Dataset metadata."""
         self = cls()
         self._dataset = CoreDataset.from_yaml(path=path, client=client)
+        self._files = [DatasetFile(f) for f in self._dataset.files]
 
         return self
 
     @staticmethod
     def list():
         """List all datasets in a project."""
-        project = get_current_project()
-        client = project.client
-        return [Dataset.from_dataset_metadata(p, client) for p in client.datasets.keys()]
+        client = get_current_project().client
+        return [Dataset.__from_yaml(p, client) for p in client.get_datasets_metadata_files()] if client else []
 
     def __getattr__(self, name):
         """Return dataset's attribute."""
-        if self._dataset and name in self.ATTRIBUTES:
+        if not self._dataset:
+            return
+
+        if name in self.ATTRIBUTES:
             return getattr(self._dataset, name, None)
+
+        raise AttributeError(f"{self.__class__.__name__} object has no attribute {name}")
+
+    @property
+    def files(self):
+        """Return a list of dataset files."""
+        return self._files
+
+
+class DatasetFile:
+    """API DatasetFile model."""
+
+    ATTRIBUTES = ["added", "full_path", "name", "path"]
+
+    def __init__(self, dataset_file):
+        self._dataset_file = dataset_file
+
+    def __getattr__(self, name):
+        """Return dataset's attribute."""
+        if not self._dataset_file:
+            return
+
+        if name in self.ATTRIBUTES:
+            return getattr(self._dataset_file, name, None)
 
         raise AttributeError(f"{self.__class__.__name__} object has no attribute {name}")

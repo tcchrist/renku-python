@@ -19,3 +19,5 @@
 
 from renku.api.dataset import Dataset
 from renku.api.project import Project
+
+__all__ = ("Dataset", "Project")
