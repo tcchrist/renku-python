@@ -24,10 +24,25 @@ from renku.core.models.datasets import Dataset as CoreDataset
 class Dataset:
     """API Dataset model."""
 
-    ATTRIBUTES = CoreDataset.EDITABLE_FIELDS + ["name"]
+    _ATTRIBUTES = [
+        "creators",
+        "date_created",
+        "date_published",
+        "description",
+        "in_language",
+        "keywords",
+        "license",
+        "name",
+        "title",
+        "url",
+        "version",
+    ]
 
     def __init__(self):
         self._dataset = None
+
+        for name in self._ATTRIBUTES:
+            setattr(self, name, None)
         self._files = []
 
     @classmethod
@@ -45,15 +60,12 @@ class Dataset:
         client = get_current_project().client
         return [Dataset.__from_yaml(p, client) for p in client.get_datasets_metadata_files()] if client else []
 
-    def __getattr__(self, name):
-        """Return dataset's attribute."""
-        if not self._dataset:
-            return
+    def __getattribute__(self, name):
+        dataset = object.__getattribute__(self, "_dataset")
+        if dataset is not None and name in Dataset._ATTRIBUTES:
+            return getattr(dataset, name)
 
-        if name in self.ATTRIBUTES:
-            return getattr(self._dataset, name, None)
-
-        raise AttributeError(f"{self.__class__.__name__} object has no attribute {name}")
+        return object.__getattribute__(self, name)
 
     @property
     def files(self):
@@ -64,17 +76,17 @@ class Dataset:
 class DatasetFile:
     """API DatasetFile model."""
 
-    ATTRIBUTES = ["added", "full_path", "name", "path"]
+    _ATTRIBUTES = ["added", "full_path", "name", "path"]
 
     def __init__(self, dataset_file):
         self._dataset_file = dataset_file
 
-    def __getattr__(self, name):
-        """Return dataset's attribute."""
-        if not self._dataset_file:
-            return
+        for name in self._ATTRIBUTES:
+            setattr(self, name, None)
 
-        if name in self.ATTRIBUTES:
-            return getattr(self._dataset_file, name, None)
+    def __getattribute__(self, name):
+        dataset_file = object.__getattribute__(self, "_dataset_file")
+        if dataset_file is not None and name in DatasetFile._ATTRIBUTES:
+            return getattr(dataset_file, name)
 
-        raise AttributeError(f"{self.__class__.__name__} object has no attribute {name}")
+        return object.__getattribute__(self, name)
